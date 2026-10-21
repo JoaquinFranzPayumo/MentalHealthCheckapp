@@ -5,23 +5,60 @@ using TMPro;
 
 public class QuestRow : MonoBehaviour
 {
-    public Toggle toggle;
-    public TMP_Text questName;
-    public TMP_Text reward;
+    public Button completeButton;
+    public TMP_Text questLabel;
 
-    public void Setup(QuestDef quest, Action<bool> onChanged)
+    private Image buttonImg;
+    private Color ogColor;
+    private Action<bool> completeCall;
+    private bool isComplete;
+
+    private void Awake()
     {
-        toggle.onValueChanged.RemoveAllListeners();
+        if (completeButton != null)
+        {
+            buttonImg = completeButton.GetComponent<Image>();
 
-        questName.text = quest.QuestName;
-        reward.text = "0 " + quest.Reward;
-
-        toggle.onValueChanged.AddListener(
-            isOn => onChanged(isOn));
+            if (buttonImg != null)
+            {
+                ogColor = buttonImg.color;
+            }
+        }
     }
 
-    public void MarkComplete()
+    public void Setup(QuestDef quest, Action<bool> onComplete)
     {
-        toggle.interactable = false;
+         completeCall = onComplete;
+        isComplete = false;
+
+        questLabel.text = quest.QuestName + " [+" + quest.Reward + " 0]";
+
+        if (buttonImg != null)
+        {
+            buttonImg.color = ogColor;
+        }
+
+        completeButton.interactable = true;
+        completeButton.onClick.RemoveAllListeners();
+        completeButton.onClick.AddListener(CompleteQuest);
+    }
+
+    private void CompleteQuest()
+    {
+        if (isComplete)
+        {
+            return;
+        }
+
+        isComplete = true;
+        completeButton.interactable = false;
+
+        if(buttonImg != null)
+        {
+            buttonImg.color = new Color( 0.55f, 0.8f, 0.55f, 1f);
+        }
+
+        questLabel.text = "/" +questLabel.text;
+        completeCall?.Invoke(true);
     }
 }
