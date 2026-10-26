@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,31 +11,35 @@ public class QuestManager : MonoBehaviour
     [Header("Existing Quest Rows")]
     public QuestRow[] questRow;
 
-    [Header("UI")]
+    [Header("Existing UI")]
     public TMP_Text scoreTxT;
     public Button resetButton;
+
+    [Header("Quest Response UI")]
+    public GameObject responsePanel;
+    public TMP_Text responseTitleText;
+    public TMP_Text responseDescriptionText;
+    public TMP_Text responseSuggestionText;
 
     private int totalPoints = 0;
     private int completed = 0;
 
-    private readonly List<QuestDef> currentOBJ =
-        new List<QuestDef>();
+    private readonly List<QuestDef> currentOBJ = new List<QuestDef>();
+    private readonly HashSet<int> completedIndices = new HashSet<int>();
 
-    private readonly HashSet<int> completedIndices =
-        new HashSet<int>();
-
-    void Start()
+    private void Start()
     {
         if (resetButton == null || scoreTxT == null)
         {
-            Debug.LogError(
-                "QuestManager is missing a UI reference!");
+            Debug.LogError("QuestManager is missing the score text or reset button reference.");
             enabled = false;
             return;
         }
 
-        resetButton.onClick.AddListener(GenerateNewQuest);
+        if (responsePanel != null)
+            responsePanel.SetActive(false);
 
+        resetButton.onClick.AddListener(GenerateNewQuest);
         UpdateScore();
         GenerateNewQuest();
     }
@@ -45,17 +48,15 @@ public class QuestManager : MonoBehaviour
     {
         if (allQuests == null || questRow == null)
         {
-            Debug.LogError("Quest list or quest rows are missing!");
+            Debug.LogError("QuestManager: Quest list or quest rows are missing.");
             return;
         }
 
         List<QuestDef> pool = new List<QuestDef>(allQuests);
 
-        // Shuffle quests randomly.
         for (int i = pool.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
-
             QuestDef temp = pool[i];
             pool[i] = pool[j];
             pool[j] = temp;
@@ -67,24 +68,30 @@ public class QuestManager : MonoBehaviour
         completedIndices.Clear();
         completed = 0;
 
+        if (responsePanel != null)
+            responsePanel.SetActive(false);
+
         for (int i = 0; i < count; i++)
         {
             if (questRow[i] == null)
             {
-                Debug.LogError("A QuestRow reference is missing!");
+                Debug.LogError("QuestManager: A QuestRow reference is missing.");
                 continue;
             }
 
             QuestDef quest = pool[i];
             currentOBJ.Add(quest);
-
             int index = i;
 
-            questRow[i].Setup(quest, isComplete =>
-            {
-                if (isComplete)
-                    CompleteQuest(index);
-            });
+            questRow[i].Setup(
+                quest,
+                isComplete =>
+                {
+                    if (isComplete)
+                        CompleteQuest(index);
+                },
+                () => ShowQuestDetails(index)
+            );
         }
 
         for (int i = 0; i < questRow.Length; i++)
@@ -93,18 +100,39 @@ public class QuestManager : MonoBehaviour
                 questRow[i].gameObject.SetActive(i < count);
         }
 
-        resetButton.interactable =
-            count > 0 && completed == count;
-
+        resetButton.interactable = count > 0 && completed == count;
         UpdateScore();
     }
 
-    private void CompleteQuest(int index)
+    private void ShowQuestDetails(int index)
     {
         if (index < 0 || index >= currentOBJ.Count)
             return;
 
-        if (!completedIndices.Add(index))
+        QuestDef quest = currentOBJ[index];
+
+        if (responsePanel == null || responseTitleText == null ||
+            responseDescriptionText == null || responseSuggestionText == null)
+        {
+            Debug.LogWarning("Quest details UI is not fully assigned in the Inspector.");
+            return;
+        }
+
+        responsePanel.SetActive(true);
+        responseTitleText.text = quest.QuestName;
+        responseDescriptionText.text = string.IsNullOrWhiteSpace(quest.Description)
+            ? "Give this activity a try at your own pace."
+            : quest.Description;
+        responseSuggestionText.text =
+            (string.IsNullOrWhiteSpace(quest.Suggestion)
+                ? "Try starting with a small, manageable step."
+                : quest.Suggestion)
+            + "\n\nReward: " + quest.Reward + " XP";
+    }
+
+    private void CompleteQuest(int index)
+    {
+        if (index < 0 || index >= currentOBJ.Count || !completedIndices.Add(index))
             return;
 
         totalPoints += currentOBJ[index].Reward;
@@ -113,16 +141,16 @@ public class QuestManager : MonoBehaviour
         UpdateScore();
 
         resetButton.interactable =
-            completed == currentOBJ.Count &&
-            currentOBJ.Count > 0;
+            completed == currentOBJ.Count && currentOBJ.Count > 0;
     }
 
     private void UpdateScore()
     {
-        scoreTxT.text = "Total Score: " + totalPoints;
+        if (scoreTxT != null)
+            scoreTxT.text = "Total Score: " + totalPoints;
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (resetButton != null)
             resetButton.onClick.RemoveListener(GenerateNewQuest);
