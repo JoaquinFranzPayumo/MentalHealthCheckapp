@@ -203,8 +203,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1726,6 +1726,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 556506430}
+  - component: {fileID: 556506431}
   m_Layer: 0
   m_Name: JournalPage
   m_TagString: Untagged
@@ -1755,6 +1756,35 @@ RectTransform:
   m_AnchoredPosition: {x: -606, y: 309}
   m_SizeDelta: {x: 1286.1924, y: 2772.6194}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &556506431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 556506429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a57b07f75eafa4e88d0688826fcafe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JournalManager
+  journalInput: {fileID: 659144801}
+  saveButton: {fileID: 1167806892}
+  moodButtons:
+  - {fileID: 1971000179}
+  - {fileID: 1370359658}
+  - {fileID: 739304505}
+  - {fileID: 1169334248}
+  - {fileID: 2068571989}
+  moodIcons:
+  - "\U0001F327\uFE0F"
+  - "\U0001F325\uFE0F"
+  - "\U0001F324\uFE0F"
+  - "\U0001F324\uFE0F"
+  - "\u2600\uFE0F"
+  entryContainer: {fileID: 1429280385}
+  entryPrefab: {fileID: 48896145559381052, guid: e481dba74db2ec4418bb04bc754a96aa, type: 3}
+  selectedColor: {r: 0.94, g: 0.88, b: 0.77, a: 1}
 --- !u!1 &574803720
 GameObject:
   m_ObjectHideFlags: 0
@@ -2558,7 +2588,7 @@ MonoBehaviour:
   m_HideSoftKeyboard: 0
   m_CharacterValidation: 0
   m_RegexValue: 
-  m_GlobalPointSize: 24
+  m_GlobalPointSize: 36
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -3635,8 +3665,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4939,7 +4969,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 0
+  m_Spacing: -25
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
